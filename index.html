@@ -1,115 +1,279 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Klarna Useless Tasks Counter</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .container {
-            text-align: center;
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        h1 {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 30px;
-        }
-        button {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-        }
-        button:hover {
-            background: #764ba2;
-            transform: scale(1.05);
-        }
-        button:active {
-            transform: scale(0.95);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Blunder Counter</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --board-dark: #211a13;
+    --board-darker: #16110b;
+    --square-light: #3a2f23;
+    --cream: #ece3d0;
+    --gold: #c9a35f;
+    --gold-bright: #e3c179;
+    --blunder-red: #9a2d22;
+    --blunder-red-bright: #e0473a;
+    --shadow: rgba(0,0,0,0.5);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 32px;
+    font-family: 'Inter', sans-serif;
+    color: var(--cream);
+    background:
+      repeating-conic-gradient(var(--board-dark) 0% 25%, var(--board-darker) 0% 50%) 50% / 64px 64px,
+      var(--board-darker);
+    background-blend-mode: normal;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 40%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%);
+    pointer-events: none;
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 540px;
+    width: 100%;
+    background: linear-gradient(160deg, rgba(255,255,255,0.04), rgba(0,0,0,0.25));
+    border: 1px solid rgba(201, 163, 95, 0.25);
+    border-radius: 20px;
+    padding: 48px 36px 40px;
+    box-shadow: 0 30px 60px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.05);
+    backdrop-filter: blur(2px);
+  }
+
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+  }
+
+  .badge {
+    width: 78px;
+    height: 78px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--blunder-red-bright), var(--blunder-red) 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.9rem;
+    color: var(--cream);
+    box-shadow: 0 8px 22px rgba(154, 45, 34, 0.45), inset 0 2px 4px rgba(255,255,255,0.25);
+    border: 2px solid rgba(255,255,255,0.15);
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  .badge.shake {
+    animation: shake 0.5s ease;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    20% { transform: rotate(-10deg) scale(1.08); }
+    40% { transform: rotate(8deg) scale(1.08); }
+    60% { transform: rotate(-6deg) scale(1.04); }
+    80% { transform: rotate(4deg) scale(1.04); }
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.55rem;
+    line-height: 1.45;
+    margin: 0 0 8px;
+    color: var(--cream);
+  }
+
+  .subtext {
+    font-size: 0.92rem;
+    color: rgba(236, 227, 208, 0.55);
+    margin: 0 0 34px;
+  }
+
+  .counter-frame {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(201, 163, 95, 0.3);
+    border-radius: 12px;
+    padding: 18px 30px;
+    margin-bottom: 32px;
+  }
+
+  .count {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 3.6rem;
+    color: var(--gold-bright);
+    letter-spacing: 0.02em;
+    min-width: 1.5em;
+    line-height: 1;
+  }
+
+  .count-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(236, 227, 208, 0.45);
+  }
+
+  button {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.02rem;
+    font-weight: 600;
+    padding: 16px 38px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(160deg, var(--blunder-red-bright), var(--blunder-red));
+    color: var(--cream);
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(154, 45, 34, 0.4);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  }
+
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(154, 45, 34, 0.5);
+  }
+
+  button:active {
+    transform: translateY(0) scale(0.97);
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
+  }
+
+  .footnote {
+    margin-top: 26px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: rgba(236, 227, 208, 0.35);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .badge.shake { animation: none; }
+    button:hover { transform: none; }
+  }
+
+  @media (max-width: 480px) {
+    .card { padding: 36px 22px 32px; }
+    h1 { font-size: 1.3rem; }
+    .count { font-size: 2.8rem; }
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Counter of useless Klarna tasks: <span id="counter">0</span></h1>
-        <button id="incrementBtn">Click me</button>
+  <div class="card">
+    <div class="eyebrow">Global Blunder Tally</div>
+    <div class="badge" id="badge">??</div>
+    <h1>This page exists to count every pointless task we have ever completed on Klarna.</h1>
+    <p class="subtext">Somewhere, someone is doing something they didn't need to. This is their scoreboard.</p>
+
+    <div class="counter-frame">
+      <span class="count" id="count">—</span>
+      <span class="count-label">blunders</span>
     </div>
 
-    <script>
-        const JSONBIN_ID = '6a35062ff5f4af5e290df21f';
-        const JSONBIN_KEY = '$2a$10$GrKPZLc0ZMdTImNc.p2FBejFULA217NCY.FutTp8e7.qckfcCFacS';
-        
-        const API_URL = `https://api.jsonbin.io/v3/bin/${JSONBIN_ID}`;
+    <div>
+      <button id="incrementBtn">I did something useless</button>
+    </div>
 
-        // Load counter
-        async function loadCounter() {
-            try {
-                const res = await fetch(API_URL);
-                console.log('Load response status:', res.status);
-                const data = await res.json();
-                console.log('Load data:', data);
-                document.getElementById('counter').textContent = data.count || 0;
-            } catch (error) {
-                console.error('Failed to load counter:', error);
-            }
-        }
+    <div class="footnote">Click responsibly. Or don't. It doesn't matter.</div>
+  </div>
 
-        // Increment
-        async function increment() {
-            try {
-                // First, get current count
-                const res = await fetch(API_URL);
-                const data = await res.json();
-                const currentCount = data.count || 0;
-                const newCount = currentCount + 1;
-                
-                console.log('Incrementing from', currentCount, 'to', newCount);
-                
-                // Update the bin
-                const updateRes = await fetch(API_URL, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': JSONBIN_KEY
-                    },
-                    body: JSON.stringify({ count: newCount })
-                });
-                
-                console.log('Update response status:', updateRes.status);
-                
-                if (!updateRes.ok) {
-                    const errorText = await updateRes.text();
-                    console.error('Update failed:', errorText);
-                    throw new Error(`Update failed: ${updateRes.status}`);
-                }
-                
-                // Update display
-                document.getElementById('counter').textContent = newCount;
-                console.log('Success! New count:', newCount);
-            } catch (error) {
-                console.error('Failed to increment:', error);
-                alert('Error: ' + error.message);
-            }
-        }
+<script>
+  const BIN_ID = "6a35062ff5f4af5e290df21f";
+  const API_KEY = "$2a$10$GrKPZLc0ZMdTImNc.p2FBejFULA217NCY.FutTp8e7.qckfcCFacS";
+  const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-        document.getElementById('incrementBtn').onclick = increment;
-        loadCounter();
-    </script>
+  const countEl = document.getElementById("count");
+  const btn = document.getElementById("incrementBtn");
+  const badge = document.getElementById("badge");
+
+  async function getCount() {
+    const res = await fetch(`${BASE_URL}/latest`, {
+      headers: { "X-Master-Key": API_KEY }
+    });
+    const data = await res.json();
+    return data.record.count;
+  }
+
+  async function setCount(value) {
+    await fetch(BASE_URL, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": API_KEY
+      },
+      body: JSON.stringify({ count: value })
+    });
+  }
+
+  async function loadCount() {
+    try {
+      const count = await getCount();
+      countEl.textContent = count;
+    } catch (e) {
+      countEl.textContent = "??";
+      console.error(e);
+    }
+  }
+
+  function playShake() {
+    badge.classList.remove("shake");
+    void badge.offsetWidth;
+    badge.classList.add("shake");
+  }
+
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    try {
+      const current = await getCount();
+      const next = current + 1;
+      await setCount(next);
+      countEl.textContent = next;
+      playShake();
+    } catch (e) {
+      console.error(e);
+      alert("Couldn't update the counter. Try again.");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  loadCount();
+</script>
 </body>
 </html>
