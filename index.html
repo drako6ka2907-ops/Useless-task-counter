@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Klarna Useless Tasks Counter</title>
+    <title>Useless Tasks Counter</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -47,17 +47,51 @@
 </head>
 <body>
     <div class="container">
-        <h1>Klarna Useless Tasks Counter: <span id="counter">0</span></h1>
-        <button onclick="increment()">Click me</button>
+        <h1>Counter of useless tasks: <span id="counter">0</span></h1>
+        <button id="incrementBtn">Click me</button>
     </div>
 
     <script>
-        let count = 0;
+        const JSONBIN_ID = '6a35062ff5f4af5e290df21f'; // Get from jsonbin.io
+        const JSONBIN_KEY = '$2a$10$GrKPZLc0ZMdTImNc.p2FBejFULA217NCY.FutTp8e7.qckfcCFacS'; // Get from jsonbin.io
         
-        function increment() {
-            count++;
-            document.getElementById('counter').textContent = count;
+        const API_URL = `https://api.jsonbin.io/v3/bin/${JSONBIN_ID}`;
+
+        // Load counter
+        async function loadCounter() {
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                document.getElementById('counter').textContent = data.count || 0;
+            } catch (error) {
+                console.error('Failed to load counter:', error);
+            }
         }
+
+        // Increment
+        async function increment() {
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                const newCount = (data.count || 0) + 1;
+                
+                await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_KEY
+                    },
+                    body: JSON.stringify({ count: newCount })
+                });
+                
+                document.getElementById('counter').textContent = newCount;
+            } catch (error) {
+                console.error('Failed to increment:', error);
+            }
+        }
+
+        document.getElementById('incrementBtn').onclick = increment;
+        loadCounter();
     </script>
 </body>
 </html>
