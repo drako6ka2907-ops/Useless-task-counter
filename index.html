@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -52,8 +52,8 @@
     </div>
 
     <script>
-        const JSONBIN_ID = '6a35062ff5f4af5e290df21f'; // Get from jsonbin.io
-        const JSONBIN_KEY = '$2a$10$GrKPZLc0ZMdTImNc.p2FBejFULA217NCY.FutTp8e7.qckfcCFacS'; // Get from jsonbin.io
+        const JSONBIN_ID = 'YOUR_BIN_ID';
+        const JSONBIN_KEY = 'YOUR_MASTER_KEY';
         
         const API_URL = `https://api.jsonbin.io/v3/bin/${JSONBIN_ID}`;
 
@@ -61,7 +61,9 @@
         async function loadCounter() {
             try {
                 const res = await fetch(API_URL);
+                console.log('Load response status:', res.status);
                 const data = await res.json();
+                console.log('Load data:', data);
                 document.getElementById('counter').textContent = data.count || 0;
             } catch (error) {
                 console.error('Failed to load counter:', error);
@@ -71,11 +73,16 @@
         // Increment
         async function increment() {
             try {
+                // First, get current count
                 const res = await fetch(API_URL);
                 const data = await res.json();
-                const newCount = (data.count || 0) + 1;
+                const currentCount = data.count || 0;
+                const newCount = currentCount + 1;
                 
-                await fetch(API_URL, {
+                console.log('Incrementing from', currentCount, 'to', newCount);
+                
+                // Update the bin
+                const updateRes = await fetch(API_URL, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -84,9 +91,20 @@
                     body: JSON.stringify({ count: newCount })
                 });
                 
+                console.log('Update response status:', updateRes.status);
+                
+                if (!updateRes.ok) {
+                    const errorText = await updateRes.text();
+                    console.error('Update failed:', errorText);
+                    throw new Error(`Update failed: ${updateRes.status}`);
+                }
+                
+                // Update display
                 document.getElementById('counter').textContent = newCount;
+                console.log('Success! New count:', newCount);
             } catch (error) {
                 console.error('Failed to increment:', error);
+                alert('Error: ' + error.message);
             }
         }
 
